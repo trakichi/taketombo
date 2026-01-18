@@ -1,0 +1,1292 @@
+/* ゲームコンテナ */
+.game-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh; /* モバイル対応 */
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 背景（空） */
+.sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+  z-index: 0;
+  transition: opacity 0.5s ease;
+}
+
+.sky.hidden {
+  opacity: 0;
+}
+
+.cloud {
+  position: absolute;
+  background: white;
+  border-radius: 50px;
+  opacity: 0.8;
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud-1 {
+  width: 100px;
+  height: 40px;
+  top: 8%;
+  left: -100px;
+  animation: cloud-float 25s linear infinite;
+}
+
+.cloud-1::before {
+  width: 50px;
+  height: 50px;
+  top: -25px;
+  left: 15px;
+}
+
+.cloud-1::after {
+  width: 40px;
+  height: 40px;
+  top: -20px;
+  left: 45px;
+}
+
+.cloud-2 {
+  width: 80px;
+  height: 30px;
+  top: 15%;
+  left: -80px;
+  animation: cloud-float 30s linear infinite;
+  animation-delay: -10s;
+}
+
+.cloud-2::before {
+  width: 40px;
+  height: 40px;
+  top: -20px;
+  left: 10px;
+}
+
+.cloud-2::after {
+  width: 30px;
+  height: 30px;
+  top: -15px;
+  left: 35px;
+}
+
+.cloud-3 {
+  width: 120px;
+  height: 45px;
+  top: 5%;
+  left: -120px;
+  animation: cloud-float 35s linear infinite;
+  animation-delay: -20s;
+}
+
+.cloud-3::before {
+  width: 60px;
+  height: 60px;
+  top: -30px;
+  left: 20px;
+}
+
+.cloud-3::after {
+  width: 45px;
+  height: 45px;
+  top: -22px;
+  left: 55px;
+}
+
+@keyframes cloud-float {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(100vw + 150px));
+  }
+}
+
+/* 国旗背景 */
+.flag-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: flag-appear 0.5s ease-out;
+}
+
+.flag-emoji {
+  font-size: 15rem;
+  opacity: 0.2;
+  animation: flag-pulse 2s ease-in-out infinite;
+}
+
+@keyframes flag-appear {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes flag-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* 竹とんぼ - 2倍サイズ */
+.taketombo {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  transition: transform 0.3s ease;
+}
+
+.propeller {
+  position: relative;
+  width: 320px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.blade {
+  position: absolute;
+  width: 150px;
+  height: 35px;
+  background: var(--blade-color, linear-gradient(180deg, #F5DEB3 0%, #DEB887 40%, #D2B48C 100%));
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  transition: background 0.5s ease;
+}
+
+/* 羽を上向きに（左羽は右上がり、右羽は左上がり） */
+.blade-left {
+  left: 0;
+  transform: rotate(8deg);
+  border-radius: 50% 5px 5px 50%;
+  transform-origin: right center;
+}
+
+.blade-right {
+  right: 0;
+  transform: rotate(-8deg);
+  border-radius: 5px 50% 50% 5px;
+  transform-origin: left center;
+}
+
+.propeller-center {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background: var(--center-color, linear-gradient(135deg, #8FBC8F 0%, #6B8E23 100%));
+  border-radius: 50%;
+  z-index: 5;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: background 0.5s ease;
+}
+
+.stick {
+  width: 20px;
+  height: 200px;
+  background: var(--stick-color, linear-gradient(90deg, #8B4513 0%, #CD853F 30%, #A0522D 70%, #8B4513 100%));
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.25);
+  position: relative;
+  transition: background 0.5s ease;
+}
+
+.stick::before {
+  content: '';
+  position: absolute;
+  top: 35px;
+  left: 3px;
+  width: 14px;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.stick::after {
+  content: '';
+  position: absolute;
+  top: 90px;
+  left: 3px;
+  width: 14px;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+/* 握っている状態 - 竹とんぼが手の位置に合わせて下がる */
+.taketombo.holding {
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.taketombo.holding .propeller {
+  animation: propeller-ready 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes propeller-ready {
+  0% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(5deg);
+  }
+}
+
+/* 飛行アニメーション - 失敗 */
+/* 少し浮いてすぐ落下、距離感なし */
+.taketombo.launched.fail {
+  animation: fly-fail 1s ease-out forwards;
+}
+
+.taketombo.launched.fail .propeller {
+  animation: spin-slow 1s linear;
+}
+
+@keyframes fly-fail {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  /* 少しだけ奥に行きながら浮く */
+  20% {
+    transform: translate(-50%, -60%) scale(0.9);
+    opacity: 1;
+  }
+  /* 力尽きて傾く */
+  40% {
+    transform: translate(-50%, -55%) scale(0.85) rotate(30deg);
+    opacity: 1;
+  }
+  /* 落下開始 */
+  60% {
+    transform: translate(-45%, 0%) scale(0.9) rotate(90deg);
+    opacity: 0.9;
+  }
+  /* 地面に落ちる */
+  100% {
+    transform: translate(-40%, 150%) scale(1) rotate(180deg);
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(400deg);
+  }
+}
+
+/* 飛行アニメーション - 普通 */
+/* 奥に行ってから上昇、徐々に小さくなる */
+.taketombo.launched.normal {
+  animation: fly-normal 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.taketombo.launched.normal .propeller {
+  animation: spin-fast 2s linear;
+}
+
+@keyframes fly-normal {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  /* まず少し奥へ（小さくなる）*/
+  15% {
+    transform: translate(-50%, -60%) scale(0.7);
+    opacity: 1;
+  }
+  /* 奥で安定しながら上昇開始 */
+  35% {
+    transform: translate(-50%, -120%) scale(0.5);
+    opacity: 1;
+  }
+  /* さらに上昇、どんどん小さく */
+  60% {
+    transform: translate(-48%, -220%) scale(0.35);
+    opacity: 0.9;
+  }
+  /* 遠くへ消えていく */
+  100% {
+    transform: translate(-45%, -350%) scale(0.15);
+    opacity: 0;
+  }
+}
+
+@keyframes spin-fast {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(2160deg);
+  }
+}
+
+/* 飛行アニメーション - 世界へ */
+/* 一気に奥へ行き、加速しながら空の彼方へ */
+.taketombo.launched.world {
+  animation: fly-world 3s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.taketombo.launched.world .propeller {
+  animation: spin-super 3s linear;
+}
+
+@keyframes fly-world {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  /* 勢いよく奥へ飛び出す */
+  10% {
+    transform: translate(-50%, -70%) scale(0.6);
+    opacity: 1;
+  }
+  /* 一気に加速、空に向かう */
+  25% {
+    transform: translate(-50%, -150%) scale(0.35);
+    opacity: 1;
+  }
+  /* 斜め上に弧を描く */
+  45% {
+    transform: translate(-20%, -280%) scale(0.2);
+    opacity: 1;
+  }
+  /* 空の遠くへ */
+  65% {
+    transform: translate(30%, -380%) scale(0.1);
+    opacity: 0.8;
+  }
+  /* キラッと光って消える演出 */
+  80% {
+    transform: translate(80%, -450%) scale(0.05);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(150%, -500%) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes spin-super {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(5400deg);
+  }
+}
+
+/* 結果後は非表示 */
+.taketombo.result {
+  opacity: 0;
+}
+
+/* 手 - 横向き（手のひらを内側に向ける）で竹とんぼを握る */
+.hands {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 120px));
+  display: flex;
+  gap: 140px;
+  z-index: 25;
+  transition: all 0.3s ease;
+}
+
+.hand {
+  position: relative;
+  width: 140px;
+  height: 100px;
+}
+
+/* 左手 - 手のひらを右に向ける */
+.left-hand {
+  transform: scaleX(1);
+}
+
+/* 右手 - 手のひらを左に向ける（左手の反転）*/
+.right-hand {
+  transform: scaleX(-1);
+}
+
+.palm {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 70px;
+  height: 85px;
+  background: linear-gradient(90deg, #FFE4C4 0%, #FFDAB9 50%, #F5C9A6 100%);
+  border-radius: 12px 20px 25px 15px;
+  box-shadow:
+    inset 3px 0 10px rgba(205, 133, 63, 0.2),
+    inset -3px 0 10px rgba(255, 255, 255, 0.4),
+    3px 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.palm-line {
+  position: absolute;
+  background: rgba(205, 133, 63, 0.2);
+  border-radius: 50%;
+}
+
+.palm-line.line-1 {
+  width: 3px;
+  height: 40px;
+  top: 20px;
+  left: 20px;
+  transform: rotate(5deg);
+}
+
+.palm-line.line-2 {
+  width: 2px;
+  height: 30px;
+  top: 30px;
+  left: 35px;
+  transform: rotate(8deg);
+}
+
+/* 指 - 横向きに配置（手のひらから左に伸びる）*/
+.fingers {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.finger {
+  background: linear-gradient(180deg, #FFDAB9 0%, #FFE4C4 50%, #FFDAB9 100%);
+  border-radius: 6px 6px 8px 8px;
+  transform-origin: right center;
+  transition: transform 0.3s ease;
+  position: relative;
+  box-shadow:
+    inset 0 -2px 5px rgba(205, 133, 63, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 指のサイズ（横向きなので幅と高さが逆）*/
+.finger-index {
+  width: 50px;
+  height: 15px;
+}
+
+.finger-middle {
+  width: 55px;
+  height: 15px;
+}
+
+.finger-ring {
+  width: 50px;
+  height: 14px;
+}
+
+.finger-pinky {
+  width: 40px;
+  height: 12px;
+}
+
+.knuckle {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 70%;
+  background: rgba(205, 133, 63, 0.2);
+  border-radius: 2px;
+}
+
+/* 親指 - 手のひらの上部から斜め上に */
+.thumb {
+  position: absolute;
+  width: 40px;
+  height: 18px;
+  background: linear-gradient(180deg, #FFDAB9 0%, #FFE4C4 50%, #FFDAB9 100%);
+  border-radius: 8px 8px 10px 10px;
+  right: 25px;
+  top: -5px;
+  transform: rotate(-30deg);
+  transform-origin: right center;
+  transition: all 0.3s ease;
+  box-shadow:
+    inset 0 -2px 5px rgba(205, 133, 63, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.thumb-knuckle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: rgba(205, 133, 63, 0.2);
+  border-radius: 2px;
+}
+
+/* 待機状態 - 手が離れている、指は軽く開いた状態 */
+.hands.ready {
+  gap: 140px;
+}
+
+.hands.ready .finger {
+  transform: rotate(0deg);
+}
+
+.hands.ready .thumb {
+  transform: rotate(-30deg);
+}
+
+/* 握っている状態 - 手が寄って棒を握る */
+.hands.holding {
+  gap: 20px;
+  z-index: 35;
+}
+
+/* 指を曲げて握る（内側に向かって曲げる）*/
+.hands.holding .finger-index {
+  transform: rotate(70deg);
+}
+
+.hands.holding .finger-middle {
+  transform: rotate(80deg);
+}
+
+.hands.holding .finger-ring {
+  transform: rotate(75deg);
+}
+
+.hands.holding .finger-pinky {
+  transform: rotate(65deg);
+}
+
+/* 親指を閉じる */
+.hands.holding .thumb {
+  transform: rotate(20deg) translateY(15px);
+}
+
+/* 飛ばした後 - 手が開く */
+.hands.launched,
+.hands.result {
+  gap: 200px;
+}
+
+.hands.launched .finger,
+.hands.result .finger {
+  transform: rotate(-10deg);
+}
+
+.hands.launched .thumb,
+.hands.result .thumb {
+  transform: rotate(-40deg);
+}
+
+/* 操作説明（手の下に配置） */
+.instruction {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  font-size: 1.1rem;
+  color: #444;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 24px;
+  border-radius: 25px;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease;
+}
+
+.instruction.result {
+  opacity: 0;
+}
+
+/* 結果表示 */
+.result-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  text-align: center;
+  padding: 25px 35px;
+  border-radius: 20px;
+  animation: result-appear 0.5s ease-out;
+  max-width: 90%;
+  width: 320px;
+}
+
+@keyframes result-appear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.result-display.fail {
+  background: rgba(255, 100, 100, 0.95);
+  color: white;
+  box-shadow: 0 10px 40px rgba(255, 100, 100, 0.4);
+}
+
+.result-display.normal {
+  background: rgba(100, 200, 100, 0.95);
+  color: white;
+  box-shadow: 0 10px 40px rgba(100, 200, 100, 0.4);
+}
+
+.result-display.world {
+  background: rgba(255, 255, 255, 0.98);
+  color: #333;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+  width: 340px;
+}
+
+.result-message {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+}
+
+.world-result {
+  margin-top: 15px;
+}
+
+.country-name {
+  font-size: 2rem;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.country-message {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.trivia-box {
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+  text-align: left;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.trivia-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #F57C00;
+  margin: 0 0 8px 0;
+}
+
+.trivia-text {
+  font-size: 0.95rem;
+  color: #5D4037;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* リトライボタン */
+.retry-button {
+  margin-top: 20px;
+  padding: 14px 35px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.retry-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.5);
+}
+
+.retry-button:active {
+  transform: scale(0.98);
+}
+
+/* 統計 */
+.stats {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: #555;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px 18px;
+  border-radius: 20px;
+  z-index: 50;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stats span {
+  white-space: nowrap;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 480px) {
+  .taketombo {
+    top: 55%;
+  }
+
+  .propeller {
+    width: 260px;
+    height: 42px;
+  }
+
+  .blade {
+    width: 120px;
+    height: 28px;
+  }
+
+  .propeller-center {
+    width: 24px;
+    height: 24px;
+  }
+
+  .stick {
+    width: 16px;
+    height: 160px;
+  }
+
+  .hands {
+    top: 55%;
+    transform: translate(-50%, calc(-50% + 100px));
+  }
+
+  .hand {
+    width: 110px;
+    height: 80px;
+  }
+
+  .palm {
+    width: 55px;
+    height: 70px;
+  }
+
+  .finger-index {
+    width: 40px;
+    height: 12px;
+  }
+
+  .finger-middle {
+    width: 45px;
+    height: 12px;
+  }
+
+  .finger-ring {
+    width: 40px;
+    height: 11px;
+  }
+
+  .finger-pinky {
+    width: 32px;
+    height: 10px;
+  }
+
+  .thumb {
+    width: 32px;
+    height: 14px;
+  }
+
+  .hands.ready {
+    gap: 110px;
+  }
+
+  .hands.holding {
+    gap: 15px;
+  }
+
+  .hands.launched,
+  .hands.result {
+    gap: 160px;
+  }
+
+  .instruction {
+    bottom: 6%;
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+
+  .result-display {
+    width: 290px;
+    padding: 20px 25px;
+  }
+
+  .result-message {
+    font-size: 1.2rem;
+  }
+
+  .country-name {
+    font-size: 1.6rem;
+  }
+
+  .country-message {
+    font-size: 0.9rem;
+  }
+
+  .trivia-box {
+    padding: 12px;
+  }
+
+  .trivia-label {
+    font-size: 0.85rem;
+  }
+
+  .trivia-text {
+    font-size: 0.88rem;
+  }
+
+  .retry-button {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
+
+  .stats {
+    font-size: 0.8rem;
+    gap: 10px;
+    padding: 8px 15px;
+  }
+
+  .flag-emoji {
+    font-size: 10rem;
+  }
+}
+
+/* 小さい画面用 */
+@media (max-height: 700px) {
+  .taketombo {
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.75);
+  }
+
+  .hands {
+    top: 50%;
+    transform: translate(-50%, calc(-50% + 70px)) scale(0.75);
+  }
+
+  .instruction {
+    bottom: 12%;
+  }
+
+  .result-display {
+    top: 45%;
+  }
+}
+
+/* =====================================================
+   竹林演出（環境活動ギミック）
+   30回ごとに発動する竹切り演出
+   ===================================================== */
+
+/* 竹林オーバーレイ全体 */
+.bamboo-forest-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  animation: overlay-fade-in 0.8s ease-out;
+  cursor: pointer;
+}
+
+@keyframes overlay-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 竹林背景 */
+.bamboo-forest-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    #E8F5E9 0%,
+    #C8E6C9 30%,
+    #A5D6A7 60%,
+    #81C784 100%
+  );
+  overflow: hidden;
+}
+
+/* 背景の竹（遠景） */
+.bamboo-bg {
+  position: absolute;
+  bottom: 0;
+  width: 25px;
+  background: linear-gradient(
+    90deg,
+    #66BB6A 0%,
+    #81C784 30%,
+    #A5D6A7 50%,
+    #81C784 70%,
+    #66BB6A 100%
+  );
+  border-radius: 10px 10px 0 0;
+}
+
+/* メインの竹（切る対象） */
+.bamboo-main {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+  animation: bamboo-appear 0.6s ease-out;
+  transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.bamboo-main.cut {
+  transform: translateX(-50%) rotate(75deg) translateY(30%);
+}
+
+@keyframes bamboo-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 竹の幹 */
+.bamboo-trunk {
+  width: 45px;
+  height: 70vh;
+  max-height: 500px;
+  background: linear-gradient(
+    90deg,
+    #43A047 0%,
+    #66BB6A 25%,
+    #81C784 50%,
+    #66BB6A 75%,
+    #43A047 100%
+  );
+  border-radius: 20px 20px 5px 5px;
+  position: relative;
+  box-shadow:
+    inset -8px 0 15px rgba(0, 0, 0, 0.1),
+    inset 8px 0 15px rgba(255, 255, 255, 0.2),
+    4px 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 竹の節（ふし） */
+.bamboo-node {
+  position: absolute;
+  left: -3px;
+  width: calc(100% + 6px);
+  height: 8px;
+  background: linear-gradient(
+    180deg,
+    #2E7D32 0%,
+    #43A047 50%,
+    #2E7D32 100%
+  );
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 竹の葉 */
+.bamboo-leaves {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.leaf {
+  position: absolute;
+  width: 60px;
+  height: 15px;
+  background: linear-gradient(
+    180deg,
+    #81C784 0%,
+    #66BB6A 100%
+  );
+  border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+  transform-origin: left center;
+}
+
+.leaf-1 {
+  transform: rotate(-45deg);
+  left: -10px;
+  top: -30px;
+}
+
+.leaf-2 {
+  transform: rotate(45deg);
+  left: -50px;
+  top: -30px;
+}
+
+.leaf-3 {
+  transform: rotate(-10deg);
+  left: -30px;
+  top: -50px;
+  width: 70px;
+}
+
+/* ノコギリ */
+.saw {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%) translateX(40px);
+  animation: saw-motion 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes saw-motion {
+  0% {
+    transform: translateX(-50%) translateX(30px);
+  }
+  100% {
+    transform: translateX(-50%) translateX(50px);
+  }
+}
+
+.saw-blade {
+  width: 80px;
+  height: 25px;
+  background: linear-gradient(
+    180deg,
+    #B0BEC5 0%,
+    #78909C 50%,
+    #607D8B 100%
+  );
+  border-radius: 0 5px 5px 0;
+  position: relative;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* ノコギリの歯 */
+.saw-blade::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 4px,
+    #455A64 4px,
+    #455A64 8px
+  );
+  clip-path: polygon(
+    0% 100%,
+    5% 0%, 10% 100%,
+    15% 0%, 20% 100%,
+    25% 0%, 30% 100%,
+    35% 0%, 40% 100%,
+    45% 0%, 50% 100%,
+    55% 0%, 60% 100%,
+    65% 0%, 70% 100%,
+    75% 0%, 80% 100%,
+    85% 0%, 90% 100%,
+    95% 0%, 100% 100%
+  );
+}
+
+.saw-handle {
+  width: 30px;
+  height: 40px;
+  background: linear-gradient(
+    90deg,
+    #8D6E63 0%,
+    #A1887F 50%,
+    #8D6E63 100%
+  );
+  border-radius: 5px;
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* 竹切り演出の説明テキスト */
+.bamboo-instruction {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.bamboo-instruction p {
+  font-size: 1.2rem;
+  color: #2E7D32;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 25px;
+  border-radius: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+}
+
+.bamboo-instruction .cut-complete {
+  color: #1B5E20;
+  font-weight: bold;
+  animation: cut-complete-pulse 0.5s ease-out;
+}
+
+@keyframes cut-complete-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 切られた竹の本数表示（常時表示） */
+.bamboo-count {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  color: #558B2F;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 6px 14px;
+  border-radius: 15px;
+  z-index: 60;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+/* 10回ごとの色変更ボーナス */
+.color-change-bonus {
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  border-radius: 12px;
+  padding: 12px 15px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.color-change-bonus .bonus-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #1565C0;
+  margin: 0 0 5px 0;
+}
+
+.color-change-bonus .bonus-text {
+  font-size: 0.9rem;
+  color: #1976D2;
+  margin: 0;
+}
+
+/* レスポンシブ対応：竹林演出 */
+@media (max-width: 480px) {
+  .bamboo-trunk {
+    width: 35px;
+    height: 60vh;
+  }
+
+  .bamboo-node {
+    height: 6px;
+  }
+
+  .leaf {
+    width: 45px;
+    height: 12px;
+  }
+
+  .saw-blade {
+    width: 60px;
+    height: 20px;
+  }
+
+  .saw-handle {
+    width: 25px;
+    height: 35px;
+  }
+
+  .bamboo-instruction p {
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+
+  .bamboo-count {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+  }
+
+  .bamboo-bg {
+    width: 18px;
+  }
+}
