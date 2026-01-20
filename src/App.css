@@ -1,3 +1,305 @@
+/* =====================================================
+   イントロ画面
+   ===================================================== */
+
+/* Google Fonts: 子供向けの丸みのあるフォント */
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap');
+
+.intro-screen {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Zen Maru Gothic', sans-serif;
+}
+
+.intro-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #E0F6FF 100%);
+  z-index: 0;
+}
+
+.intro-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  max-width: 400px;
+  width: 100%;
+}
+
+/* タイトル */
+.intro-title {
+  text-align: center;
+  margin: 0;
+  animation: title-bounce 2s ease-in-out infinite;
+}
+
+.title-line {
+  display: block;
+  color: #5D4037;
+  text-shadow:
+    2px 2px 0 #fff,
+    -2px -2px 0 #fff,
+    2px -2px 0 #fff,
+    -2px 2px 0 #fff,
+    3px 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.title-line:first-child {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.title-main {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #2E7D32;
+  letter-spacing: 0.15em;
+  margin-top: 5px;
+}
+
+@keyframes title-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* イントロ画面の竹とんぼ */
+.intro-taketombo {
+  transform: scale(0.7);
+  animation: intro-float 3s ease-in-out infinite;
+}
+
+@keyframes intro-float {
+  0%, 100% {
+    transform: scale(0.7) translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: scale(0.7) translateY(-15px) rotate(5deg);
+  }
+}
+
+/* ランキングセクション */
+.ranking-section {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px 25px;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.ranking-title {
+  font-size: 1.2rem;
+  color: #F57C00;
+  text-align: center;
+  margin: 0 0 15px 0;
+  font-weight: 700;
+}
+
+.ranking-card {
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rank-emoji {
+  font-size: 2rem;
+}
+
+.rank-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #5D4037;
+}
+
+.rank-value {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #E65100;
+  margin-left: auto;
+}
+
+.rank-desc {
+  width: 100%;
+  font-size: 0.85rem;
+  color: #8D6E63;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.ranking-hint {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+  margin: 12px 0 0 0;
+}
+
+/* スタートボタン */
+.start-button {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: white;
+  background: linear-gradient(135deg, #FF6F00 0%, #FF8F00 50%, #FFA000 100%);
+  border: none;
+  border-radius: 50px;
+  padding: 18px 60px;
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #E65100,
+    0 10px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  animation: button-pulse 2s ease-in-out infinite;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 0 #E65100,
+    0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+.start-button:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #E65100,
+    0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes button-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+/* =====================================================
+   アフィリエイトボタン（リトライボタンと同じデザイン）
+   ===================================================== */
+
+.affiliate-button {
+  display: block;
+  width: 85%;
+  max-width: 320px;
+  margin: 12px auto;
+  padding: 14px 20px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.affiliate-button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.5);
+  color: white;
+}
+
+.affiliate-button:active {
+  transform: scale(0.98);
+}
+
+/* セカンダリボタン（ボタン後の配置用） */
+.affiliate-secondary {
+  background: linear-gradient(135deg, #5D4037 0%, #795548 100%);
+  box-shadow: 0 4px 15px rgba(93, 64, 55, 0.4);
+  font-size: 0.85rem;
+  padding: 12px 18px;
+}
+
+.affiliate-secondary:hover {
+  box-shadow: 0 6px 20px rgba(93, 64, 55, 0.5);
+}
+
+/* レスポンシブ：イントロ画面 */
+@media (max-width: 480px) {
+  .title-line:first-child {
+    font-size: 1.3rem;
+  }
+
+  .title-main {
+    font-size: 2.5rem;
+  }
+
+  .intro-taketombo {
+    transform: scale(0.55);
+  }
+
+  .ranking-section {
+    padding: 15px 20px;
+  }
+
+  .ranking-title {
+    font-size: 1.1rem;
+  }
+
+  .rank-value {
+    font-size: 1.2rem;
+  }
+
+  .start-button {
+    font-size: 1.3rem;
+    padding: 15px 50px;
+  }
+}
+
+@media (max-height: 650px) {
+  .intro-content {
+    gap: 12px;
+  }
+
+  .intro-taketombo {
+    transform: scale(0.5);
+  }
+
+  .ranking-section {
+    padding: 12px 18px;
+  }
+
+  .start-button {
+    padding: 12px 40px;
+    font-size: 1.2rem;
+  }
+}
+
+/* =====================================================
+   ゲーム画面
+   ===================================================== */
+
 /* ゲームコンテナ */
 .game-container {
   position: relative;
@@ -1289,4 +1591,14 @@
   .bamboo-bg {
     width: 18px;
   }
+}
+
+/* =====================================================
+   アフィリエイトリンク（リトライボタンの代わり）
+   ===================================================== */
+
+.retry-button.affiliate-link {
+  display: inline-block;
+  text-decoration: none;
+  line-height: 1.4;
 }

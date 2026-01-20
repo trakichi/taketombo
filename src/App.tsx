@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import './App.css'
 
+type AppScreen = 'intro' | 'game'
 type GameState = 'ready' | 'holding' | 'launched' | 'result'
 type ResultType = 'none' | 'fail' | 'normal' | 'world'
 
@@ -24,6 +25,11 @@ interface TaketomboColor {
   blade: string
   stick: string
   center: string
+}
+
+interface WeeklyRecord {
+  weekStart: string // 週の開始日（月曜日）をISO形式で保存
+  worldCount: number
 }
 
 const TAKETOMBO_COLORS: TaketomboColor[] = [
@@ -147,10 +153,53 @@ const COUNTRIES: Country[] = [
   },
 ]
 
+// アフィリエイトリンク
+const AFFILIATE_LINKS = [
+  'https://amzn.to/4a1CZXA',
+  'https://amzn.to/4r7VgbL',
+  'https://amzn.to/4r7VgbL',
+  'https://amzn.to/49vP5s2',
+  'https://amzn.to/4pYbVgY',
+  'https://amzn.to/4jNTk5q',
+]
+
+// アフィリエイトボタンの文言（結果タイプ別）
+const AFFILIATE_TEXTS = {
+  fail: [
+    '次こそ飛ばせるように、ちょっとしたプレゼント🎁',
+    'がんばったあなたに、小さなごほうび！',
+    'あれ？今日はちょっと機嫌悪い？🎁',
+    '失敗は成功のもと！ヒントを見てみる？✨',
+  ],
+  normal: [
+    '本物の竹とんぼ、ちょっと見てみる？🌿',
+    'ナイスフライト！本物はもっとすごいよ👀✨',
+    'いい風が吹いてるね…本物の竹とんぼはどう？🍃',
+    '今回うまかったね！本物も見せてあげる🌱',
+  ],
+  world: [
+    'おめでとう！世界フライト記念プレゼント🎉',
+    '特別なプレゼントをどうぞ🎁',
+    '買い物選びはこのボタンから✈️🌏',
+    'すごい！世界飛行&物欲開放！🎉',
+  ],
+}
+
 // localStorageのキー
 const STORAGE_KEYS = {
   TOTAL_PLAYS: 'taketombo_totalPlays',
   CUT_BAMBOO_COUNT: 'taketombo_cutBambooCount',
+  WEEKLY_RECORD: 'taketombo_weeklyRecord',
+}
+
+// 今週の月曜日を取得
+function getWeekStart(): string {
+  const now = new Date()
+  const day = now.getDay()
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1) // 月曜日に調整
+  const monday = new Date(now.setDate(diff))
+  monday.setHours(0, 0, 0, 0)
+  return monday.toISOString().split('T')[0]
 }
 
 function getResult(): ResultType {
@@ -172,6 +221,15 @@ function getRandomColor(currentIndex: number): number {
   return newIndex
 }
 
+function getRandomAffiliateLink(): string {
+  return AFFILIATE_LINKS[Math.floor(Math.random() * AFFILIATE_LINKS.length)]
+}
+
+function getRandomAffiliateText(resultType: ResultType): string {
+  const texts = AFFILIATE_TEXTS[resultType === 'none' ? 'fail' : resultType]
+  return texts[Math.floor(Math.random() * texts.length)]
+}
+
 // localStorageから値を取得
 function getStoredNumber(key: string, defaultValue: number): number {
   const stored = localStorage.getItem(key)
@@ -182,7 +240,29 @@ function getStoredNumber(key: string, defaultValue: number): number {
   return defaultValue
 }
 
+// 週間記録を取得
+function getWeeklyRecord(): WeeklyRecord {
+  const stored = localStorage.getItem(STORAGE_KEYS.WEEKLY_RECORD)
+  const currentWeekStart = getWeekStart()
+
+  if (stored) {
+    try {
+      const record: WeeklyRecord = JSON.parse(stored)
+      // 今週のデータかチェック
+      if (record.weekStart === currentWeekStart) {
+        return record
+      }
+    } catch {
+      // パースエラーの場合は新規作成
+    }
+  }
+
+  // 新しい週または初回
+  return { weekStart: currentWeekStart, worldCount: 0 }
+}
+
 function App() {
+  const [screen, setScreen] = useState<AppScreen>('intro')
   const [gameState, setGameState] = useState<GameState>('ready')
   const [result, setResult] = useState<ResultType>('none')
   const [country, setCountry] = useState<Country | null>(null)
@@ -195,6 +275,16 @@ function App() {
   const [cutBambooCount, setCutBambooCount] = useState<number>(() => getStoredNumber(STORAGE_KEYS.CUT_BAMBOO_COUNT, 0))
   const [showBambooCutAnimation, setShowBambooCutAnimation] = useState(false)
   const [bambooIsCut, setBambooIsCut] = useState(false)
+
+  // 週間ランキング
+  const [weeklyRecord, setWeeklyRecord] = useState<WeeklyRecord>(() => getWeeklyRecord())
+
+  // アフィリエイト表示制御
+  const [showAffiliate, setShowAffiliate] = useState(false)
+  const [affiliateLink, setAffiliateLink] = useState('')
+  const [affiliateText, setAffiliateText] = useState('')
+  const [affiliateClicked, setAffiliateClicked] = useState(false) // アフィリエイトリンクがクリックされたか
+  const resultCountRef = useRef(0) // 結果表示回数をカウント
 
   const touchStartX = useRef(0)
   const touchStartTime = useRef(0)
@@ -209,6 +299,30 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.CUT_BAMBOO_COUNT, cutBambooCount.toString())
   }, [cutBambooCount])
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.WEEKLY_RECORD, JSON.stringify(weeklyRecord))
+  }, [weeklyRecord])
+
+  // アフィリエイトリンクをクリックした後、ページに戻ってきたらready状態に戻す
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && affiliateClicked) {
+        // ページが再表示され、アフィリエイトリンクがクリックされていた場合
+        setGameState('ready')
+        setResult('none')
+        setCountry(null)
+        setShowColorChange(false)
+        setShowAffiliate(false)
+        setAffiliateClicked(false)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [affiliateClicked])
 
   const handleTouchStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
     if (gameState !== 'ready' || showBambooCutAnimation) return
@@ -243,6 +357,7 @@ function App() {
         setGameState('result')
         const newTotal = stats.total + 1
         const newTotalPlays = totalPlays + 1
+        resultCountRef.current += 1
 
         setStats(prev => ({
           total: newTotal,
@@ -251,6 +366,29 @@ function App() {
           world: prev.world + (flightResult === 'world' ? 1 : 0),
         }))
         setTotalPlays(newTotalPlays)
+
+        // 週間記録を更新（世界へ飛んだ時）
+        if (flightResult === 'world') {
+          setWeeklyRecord(prev => ({
+            ...prev,
+            worldCount: prev.worldCount + 1
+          }))
+        }
+
+        // アフィリエイト表示判定
+        if (flightResult === 'world') {
+          // 世界へ飛んだ時は必ず表示
+          setShowAffiliate(true)
+          setAffiliateLink(getRandomAffiliateLink())
+          setAffiliateText(getRandomAffiliateText(flightResult))
+        } else if (resultCountRef.current % 5 === 0) {
+          // 失敗・普通は5回に1回
+          setShowAffiliate(true)
+          setAffiliateLink(getRandomAffiliateLink())
+          setAffiliateText(getRandomAffiliateText(flightResult))
+        } else {
+          setShowAffiliate(false)
+        }
 
         // 10回ごとに色が変わる
         if (newTotal % 10 === 0) {
@@ -261,7 +399,6 @@ function App() {
 
         // 30回ごとに竹を切る演出
         if (newTotalPlays % 30 === 0) {
-          // 少し遅延してから竹切り演出を開始
           setTimeout(() => {
             setShowBambooCutAnimation(true)
             setBambooIsCut(false)
@@ -273,14 +410,13 @@ function App() {
     }
   }, [gameState, stats.total, colorIndex, totalPlays])
 
-  // 竹を切るアクション（ユーザーがタップ/スワイプ）
+  // 竹を切るアクション
   const handleCutBamboo = useCallback(() => {
     if (!showBambooCutAnimation || bambooIsCut) return
 
     setBambooIsCut(true)
     setCutBambooCount(prev => prev + 1)
 
-    // 2.5秒後に演出終了
     setTimeout(() => {
       setShowBambooCutAnimation(false)
       setBambooIsCut(false)
@@ -293,6 +429,17 @@ function App() {
     setResult('none')
     setCountry(null)
     setShowColorChange(false)
+    setShowAffiliate(false)
+    setAffiliateClicked(false)
+  }
+
+  const handleAffiliateClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setAffiliateClicked(true)
+  }
+
+  const handleStartGame = () => {
+    setScreen('game')
   }
 
   const getResultMessage = () => {
@@ -323,12 +470,66 @@ function App() {
     }
   }
 
+  const getRankEmoji = (rank: number): string => {
+    if (rank === 1) return '🥇'
+    if (rank === 2) return '🥈'
+    if (rank === 3) return '🥉'
+    return `${rank}位`
+  }
+
   const taketomboStyle = {
     '--blade-color': currentColor.blade,
     '--stick-color': currentColor.stick,
     '--center-color': currentColor.center,
   } as React.CSSProperties
 
+  // イントロ画面
+  if (screen === 'intro') {
+    return (
+      <div className="intro-screen">
+        <div className="intro-bg">
+          <div className="cloud cloud-1"></div>
+          <div className="cloud cloud-2"></div>
+          <div className="cloud cloud-3"></div>
+        </div>
+
+        <div className="intro-content">
+          <h1 className="intro-title">
+            <span className="title-line">いつでもきみと</span>
+            <span className="title-line title-main">竹とんぼ</span>
+          </h1>
+
+          <div className="intro-taketombo">
+            <div className="propeller">
+              <div className="blade blade-left"></div>
+              <div className="blade blade-right"></div>
+              <div className="propeller-center"></div>
+            </div>
+            <div className="stick"></div>
+          </div>
+
+          <div className="ranking-section">
+            <h2 className="ranking-title">🏆 今週のきろく</h2>
+            <div className="ranking-card">
+              <div className="ranking-item my-rank">
+                <span className="rank-emoji">{getRankEmoji(1)}</span>
+                <span className="rank-label">あなた</span>
+                <span className="rank-value">{weeklyRecord.worldCount} 回</span>
+                <span className="rank-desc">世界へ飛ばした！</span>
+              </div>
+            </div>
+            <p className="ranking-hint">もっと世界へ飛ばそう！</p>
+          </div>
+
+          <button className="start-button" onClick={handleStartGame}>
+            あそぶ！
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ゲーム画面
   return (
     <div
       className={`game-container ${gameState === 'result' && result === 'world' ? 'world-bg' : ''}`}
@@ -359,9 +560,7 @@ function App() {
           onClick={handleCutBamboo}
           onTouchEnd={(e) => { e.stopPropagation(); handleCutBamboo(); }}
         >
-          {/* 竹林背景 */}
           <div className="bamboo-forest-bg">
-            {/* 背景の竹（遠景） */}
             {[...Array(8)].map((_, i) => (
               <div
                 key={`bg-bamboo-${i}`}
@@ -375,10 +574,8 @@ function App() {
             ))}
           </div>
 
-          {/* メインの竹（切る対象） */}
           <div className={`bamboo-main ${bambooIsCut ? 'cut' : ''}`}>
             <div className="bamboo-trunk">
-              {/* 節（ふし） */}
               {[...Array(6)].map((_, i) => (
                 <div key={`node-${i}`} className="bamboo-node" style={{ bottom: `${15 + i * 15}%` }} />
               ))}
@@ -390,7 +587,6 @@ function App() {
             </div>
           </div>
 
-          {/* ノコギリ */}
           {!bambooIsCut && (
             <div className="saw">
               <div className="saw-blade"></div>
@@ -398,7 +594,6 @@ function App() {
             </div>
           )}
 
-          {/* 説明テキスト */}
           <div className="bamboo-instruction">
             {!bambooIsCut ? (
               <p>タップして竹を切ろう！</p>
@@ -449,7 +644,7 @@ function App() {
         </div>
       </div>
 
-      {/* 操作説明（手の下） */}
+      {/* 操作説明 */}
       <p className={`instruction ${gameState}`}>{getInstructionText()}</p>
 
       {/* 結果メッセージ */}
@@ -468,7 +663,6 @@ function App() {
             </div>
           )}
 
-          {/* 10回ごとの色変更ボーナス */}
           {showColorChange && (
             <div className="color-change-bonus">
               <p className="bonus-title">🎨 色が変わった！</p>
@@ -476,9 +670,22 @@ function App() {
             </div>
           )}
 
-          <button className="retry-button" onClick={handleRetry} onTouchEnd={handleRetry}>
-            もう一度飛ばす
-          </button>
+          {/* アフィリエイト表示時はアフィリエイトボタン、それ以外はリトライボタン */}
+          {showAffiliate ? (
+            <a
+              href={affiliateLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="retry-button affiliate-link"
+              onClick={handleAffiliateClick}
+            >
+              {affiliateText}
+            </a>
+          ) : (
+            <button className="retry-button" onClick={handleRetry} onTouchEnd={handleRetry}>
+              もう一度飛ばす
+            </button>
+          )}
         </div>
       )}
 
@@ -490,7 +697,7 @@ function App() {
         <span>🌍 {stats.world}</span>
       </div>
 
-      {/* 切られた竹の本数（常時表示） */}
+      {/* 切られた竹の本数 */}
       {cutBambooCount > 0 && (
         <div className="bamboo-count">
           🎋 これまでに切られた竹の本数：{cutBambooCount} 本
