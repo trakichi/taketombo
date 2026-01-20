@@ -161,6 +161,9 @@ const AFFILIATE_LINKS = [
   'https://amzn.to/49vP5s2',
   'https://amzn.to/4pYbVgY',
   'https://amzn.to/4jNTk5q',
+  'https://amzn.to/4jRL2d9',
+  'https://amzn.to/49vqsf1',
+  'https://amzn.to/49vqsf1',
 ]
 
 // アフィリエイトボタンの文言（結果タイプ別）
